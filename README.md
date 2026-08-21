@@ -1,62 +1,88 @@
-# NeuroTrace EEG Digital Twin
+# NeuroScope EEG Dashboard
 
-NeuroTrace is an executive-grade interactive demonstration of focal seizure evolution. It synchronizes a synthetic eight-channel EEG replay with a transparent, electrical-style 3D brain containing 24 anatomical structures.
+NeuroScope 是一个可直接运行和部署的多设备 EEG 研究可视化 Demo。它把动态通道质量、合成左颞癫痫样事件、证据通道、24 结构解剖脑和多维验证框架放在同一个时间轴中。
 
-> Research visualization demo only. It is not a medical device and must not be used for diagnosis or treatment decisions.
+> Research visualization demo only. Not a medical device. Do not use it for diagnosis or treatment decisions.
 
-## Live demo
+![NeuroScope recruitment phase](./assets/preview.png)
 
-[Open the current private demo](https://neurotrace-eeg-digital-twin.gautoreview.chatgpt.site)
+## 功能
 
-## Product surface
+- EMOTIV EPOC X、EMOTIV Flex 2、Muse 2、OpenBCI Cyton、Ganglion 和通用 10–20 Profile；
+- 左侧只展示连接质量达到优秀阈值的通道，其余通道保留在可展开列表；
+- 24 秒合成病例：基线/尖慢波、左颞节律起始、邻近通道募集、发作后慢化；
+- BodyParts3D 派生的 24 结构 GLB，包括脑叶、边缘系统、深部核团、小脑和脑干；
+- Three.js 半透明材质、内部网络节点、局灶光晕、传播弧线、设备电极和可旋转视角；
+- Cortex API 与通用 WebSocket Bridge 接入骨架；
+- 硬件、数据质量、算法、脑区映射、人因、安全和工作流验证框架。
 
-- 24-second guided case replay with baseline, focal onset and network-spread chapters
-- Eight-channel synthetic bipolar EEG rendering at a simulated 256 Hz
-- Three.js anatomical digital twin with 24 selectable structures and six visibility layers
-- Synchronized seizure-onset highlighting, propagation effects and quantitative indicators
-- Presentation mode, camera presets, timeline scrubbing, speed control and responsive layouts
+## 本地运行
 
-## Quick start
+### Windows，无需安装 Node.js
 
-Requirements: Node.js 20 or newer.
+双击 `run_dashboard.cmd`。脚本会启动本地服务并打开：
+
+```text
+http://127.0.0.1:4173/
+```
+
+### Node.js 20+
 
 ```bash
-npm install
 npm run dev
 ```
 
-Open `http://127.0.0.1:4173`.
+打开 `http://127.0.0.1:4173/`。
 
-Run the complete local verification before opening a pull request:
+常用演示入口：
+
+```text
+/?scenario=temporal&time=15
+/?scenario=quality&time=10
+/?scenario=normal&time=5
+/?device=emotiv-flex-2
+/?validation=1
+```
+
+## 验证与构建
 
 ```bash
+npm run check
+npm run build
 npm run verify
 ```
 
-The production bundle is generated in `dist/` and is intentionally excluded from version control.
+生产静态文件生成在 `dist/`。`.github/workflows/pages.yml` 可以在 `main` 分支更新后构建并部署 GitHub Pages；需要在仓库 Settings → Pages 中把 Source 设为 GitHub Actions。工作流使用 GitHub 官方当前 Pages Actions 组合。
 
-## Repository map
+## 项目结构
 
-| Path | Purpose |
-| --- | --- |
-| `index.html` | Semantic application shell and social metadata |
-| `eeg-demo.css` | Responsive visual system and presentation layouts |
-| `eeg-demo.js` | EEG simulation, Three.js scene and interaction state |
-| `assets/anatomy/` | 24-region GLB model and its third-party license |
-| `scripts/build-site.mjs` | Deterministic deployment bundle generator |
-| `scripts/build_brain_glb.py` | Rebuilds the GLB from licensed BodyParts3D archives |
-| `docs/` | Architecture, demo and data-governance notes |
+```text
+.
+├── index.html                     页面结构与 Three.js import map
+├── styles.css                     仪表盘视觉和响应式布局
+├── app.js                         EEG、设备、时间轴和界面状态
+├── brain-renderer.js              24 结构解剖脑和活动动画
+├── device-profiles.js             多设备 Profile 与 montage
+├── validation-framework.js        验证维度、Metric 和 Gate
+├── cortex-client.js               EMOTIV Cortex 接入
+├── generic-device-client.js       通用设备 Bridge 接入
+├── assets/anatomy/                GLB 及其 CC BY-SA 许可
+├── assets/devices/                设备图片及来源
+├── docs/                          验证和设备适配文档
+├── scripts/                       开发服务器与静态构建
+└── .github/workflows/pages.yml    GitHub Pages 发布
+```
 
-## Collaboration workflow
+## 数据与医学边界
 
-1. Create a short-lived branch from `main`, for example `feat/eeg-channel-controls`.
-2. Keep one product concern per pull request.
-3. Run `npm run verify` and perform a visual check at desktop and tablet widths.
-4. Open a draft pull request early and attach screenshots for visible changes.
-5. Request review before merging to `main`.
+- 当前 EEG 与癫痫样事件全部是确定性的合成数据，不含真实患者数据；
+- 暖色脑区表示演示性的时序证据范围，不表示已经测得脑内传播路径；
+- 头皮 EEG 不能唯一反演精确致痫灶，界面只允许表达脑叶级模型推测；
+- 接入真实设备时，当前版本只显示原始 EEG 和质量状态，不冒充已验证的诊断算法；
+- 数据质量不足时必须拒绝强脑区输出。
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete convention.
+## 许可
 
-## Data and licensing
+应用代码使用 MIT License。`brain-renderer.js` 包含对 NeuroTrace EEG Digital Twin 渲染方式的 MIT-licensed 改编，详见 `THIRD_PARTY_NOTICES.md`。
 
-The EEG case is synthetic and contains no patient data. The anatomical GLB is derived from BodyParts3D and is distributed under CC BY-SA 2.1 Japan; see [the asset license](assets/anatomy/LICENSE.md). Application code is MIT licensed.
+`assets/anatomy/brain-anatomy.glb` 派生自 BodyParts3D，使用 CC BY-SA 2.1 Japan；模型再分发和修改必须保留署名并遵守相同许可，详见 `assets/anatomy/LICENSE.md`。

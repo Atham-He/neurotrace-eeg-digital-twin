@@ -1,13 +1,12 @@
 {
-  "name": "neurotrace-eeg-digital-twin",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Interactive EEG focal-seizure replay synchronized with a 24-region anatomical brain digital twin.",
+  "name": "neuroscope-eeg-dashboard",
+  "version": "0.2.0",
+  "description": "Multi-device EEG replay, signal-quality gating and anatomical seizure visualization demo.",
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
     "build": "node scripts/build-site.mjs",
-    "check": "node --check eeg-demo.js && node --check scripts/build-site.mjs && node --check scripts/dev-server.mjs && python3 -m py_compile scripts/build_brain_glb.py",
+    "check": "node --check app.js && node --check brain-renderer.js && node --check device-profiles.js && node --check validation-framework.js && node --check cortex-client.js && node --check generic-device-client.js && node --check scripts/dev-server.mjs && node --check scripts/build-site.mjs",
     "verify": "npm run check && npm run build"
   },
   "engines": {

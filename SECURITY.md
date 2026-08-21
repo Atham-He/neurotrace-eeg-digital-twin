@@ -1,15 +1,5 @@
-# Security and data handling
+# Security policy
 
-## Supported version
+This repository is a research visualization demo and is not approved for clinical use.
 
-Security fixes target the latest commit on `main`.
-
-## Reporting
-
-Do not open a public issue for a suspected vulnerability or accidental data exposure. Contact the repository owner privately through GitHub instead.
-
-## Data policy
-
-This demo must use synthetic or explicitly approved de-identified data only. Do not commit patient data, credentials, private deployment identifiers, exported browser sessions or local `.env` files.
-
-The current case is synthetic and contains no protected health information.
+Do not include patient identifiers, raw clinical EEG, Cortex Client Secrets or access tokens in issues, screenshots, logs or commits. Report a suspected vulnerability privately to the repository maintainers. Include the affected version, reproduction steps and potential data impact.
