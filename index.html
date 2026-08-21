@@ -5,26 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="EEG seizure activity synchronized with an interactive electrical brain visualization."
+      content="面向 EMOTIV EPOC X 的 EEG 癫痫样事件与脑区概率映射可视化原型"
     />
-    <meta name="theme-color" content="#05080f" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="NeuroTrace — EEG Seizure Digital Twin" />
-    <meta property="og:description" content="Synchronized biosignal and anatomical activity visualization." />
-    <meta property="og:image" content="https://neurotrace-eeg-digital-twin.gautoreview.chatgpt.site/assets/og.png" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="NeuroTrace — EEG Seizure Digital Twin" />
-    <meta name="twitter:description" content="Synchronized biosignal and anatomical activity visualization." />
-    <meta name="twitter:image" content="https://neurotrace-eeg-digital-twin.gautoreview.chatgpt.site/assets/og.png" />
-    <title>NeuroTrace — EEG Seizure Digital Twin</title>
-    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="eeg-demo.css" />
+    <title>NeuroScope · EPOC X EEG 可视化</title>
+    <link rel="stylesheet" href="./styles.css" />
     <script type="importmap">
       {
         "imports": {
@@ -33,226 +17,428 @@
         }
       }
     </script>
-    <script type="module" src="eeg-demo.js"></script>
   </head>
   <body>
-    <div class="ambient ambient-a" aria-hidden="true"></div>
-    <div class="ambient ambient-b" aria-hidden="true"></div>
+    <div class="noise-layer" aria-hidden="true"></div>
 
     <main class="app-shell">
       <header class="topbar">
-        <a class="brand" href="./" aria-label="NeuroTrace 首页">
-          <span class="brand-signal" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-          <span class="brand-lockup">
-            <span class="brand-word">NEURO<span>//</span>TRACE</span>
-            <small>NEURAL DIGITAL TWIN</small>
-          </span>
-        </a>
-
-        <div class="case-identity">
-          <div><span>CASE</span><strong>EEG-0247</strong></div>
-          <i aria-hidden="true"></i>
-          <div><span>SCENARIO</span><strong>FOCAL TEMPORAL ONSET</strong></div>
-          <i aria-hidden="true"></i>
-          <div><span>DURATION</span><strong>24.00 SEC</strong></div>
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div>
+            <div class="brand-name">NEURO<span>//</span>SCOPE</div>
+            <div class="brand-subtitle">EPOC X · NEURAL ACTIVITY WORKSPACE</div>
+          </div>
         </div>
 
-        <div class="system-state">
-          <span class="live-dot" aria-hidden="true"></span>
-          <span>DEMO SYSTEM ONLINE</span>
-          <span class="clock" data-clock>14:32:08</span>
-          <button class="present-button" type="button" data-present aria-label="进入全屏演示">PRESENT</button>
+        <div class="session-facts" aria-label="当前病例信息">
+          <div class="fact">
+            <span>CASE</span>
+            <strong id="case-id">DEMO-0247</strong>
+          </div>
+          <div class="fact scenario-fact">
+            <span>SCENARIO</span>
+            <select id="scenario-select" aria-label="选择演示场景">
+              <option value="temporal">左颞区疑似局灶事件</option>
+              <option value="quality">信号质量不足</option>
+              <option value="normal">正常基线</option>
+            </select>
+          </div>
+          <div class="fact device-fact" id="device-picker">
+            <span>DEVICE</span>
+            <button
+              class="device-picker-trigger"
+              id="device-picker-trigger"
+              type="button"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-controls="device-picker-menu"
+            >
+              <span class="device-selected-art" id="device-selected-art">
+                <img src="./assets/devices/epoc-x.webp" alt="" />
+              </span>
+              <span class="device-selected-copy">
+                <b id="device-selected-name">EMOTIV EPOC X</b>
+                <small id="device-selected-meta">14 CH · CORTEX API</small>
+              </span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9 5 5 5-5" /></svg>
+            </button>
+            <select id="device-profile-select" class="device-native-select" aria-label="选择 EEG 设备" tabindex="-1">
+              <option value="epoc-x">EMOTIV EPOC X</option>
+              <option value="emotiv-flex-2">EMOTIV Flex 2 · 32ch</option>
+              <option value="muse-2">InteraXon Muse 2</option>
+              <option value="openbci-cyton">OpenBCI Cyton · 8ch</option>
+              <option value="openbci-ganglion">OpenBCI Ganglion · 4ch</option>
+              <option value="generic-1020">通用 10–20 · 16ch</option>
+            </select>
+            <div class="device-picker-menu" id="device-picker-menu" role="listbox" aria-label="支持的 EEG 设备" aria-hidden="true"></div>
+          </div>
+          <div class="fact">
+            <span>SAMPLING</span>
+            <strong id="sampling-rate">256 SPS</strong>
+          </div>
+        </div>
+
+        <div class="device-actions">
+          <div class="device-status" id="device-status">
+            <i></i>
+            <span>演示数据在线</span>
+          </div>
+          <button class="outline-button" id="open-connect" type="button">
+            连接设备
+          </button>
+          <button class="icon-button" id="open-validation" type="button" aria-label="打开验证中心">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 19V9m5 10V5m5 14v-7m5 7V3" />
+            </svg>
+          </button>
         </div>
       </header>
 
-      <section class="workspace" aria-label="EEG 癫痫可视化工作区">
-        <section class="eeg-panel panel">
-          <div class="panel-heading">
+      <section class="workspace">
+        <article class="panel eeg-panel">
+          <header class="panel-header">
             <div>
-              <span class="micro-label">BIOSIGNAL / 01</span>
-              <h1>实时脑电回放</h1>
-              <p class="heading-detail">Longitudinal bipolar montage · 10–20 system</p>
+              <span class="eyebrow">BIOSIGNAL / 01</span>
+              <h1>动态脑电通道</h1>
+              <p>优先展示质量可靠且与当前事件相关的通道</p>
             </div>
-            <div class="signal-meta">
-              <span><i></i> 8 CHANNELS</span>
-              <span>256 Hz</span>
+            <div class="panel-tags">
+              <span id="channel-total"><i></i>14 EEG</span>
+              <span id="quality-filter">优秀 ≥85</span>
               <span>10 µV/mm</span>
             </div>
+          </header>
+
+          <div class="quality-strip">
+            <div class="quality-summary">
+              <span class="summary-number" id="good-count">11</span>
+              <span>优秀并展示</span>
+            </div>
+            <div class="quality-summary warning">
+              <span class="summary-number" id="attention-count">2</span>
+              <span>一般未展示</span>
+            </div>
+            <div class="quality-summary muted">
+              <span class="summary-number" id="poor-count">1</span>
+              <span>较差不参与</span>
+            </div>
+            <button class="text-button" id="toggle-sensor-map" type="button">
+              查看电极图
+            </button>
           </div>
 
-          <div class="eeg-stage">
-            <canvas data-eeg-canvas aria-label="八通道模拟 EEG 动态波形"></canvas>
-            <div class="scan-line" aria-hidden="true"></div>
-            <div class="eeg-event-line" data-event-line aria-hidden="true">
-              <span>ICTAL ONSET</span>
+          <div class="sensor-map-wrap" id="sensor-map-wrap" aria-hidden="true">
+            <div class="sensor-map-head">
+              <div class="head-nose"></div>
+              <div class="head-ear left"></div>
+              <div class="head-ear right"></div>
+              <div id="sensor-map" class="sensor-map"></div>
             </div>
-          </div>
-
-          <div class="diagnostic-strip">
-            <div>
-              <span>Dominant frequency</span>
-              <strong data-frequency>9.4 <small>Hz</small></strong>
-            </div>
-            <div>
-              <span>Peak amplitude</span>
-              <strong data-amplitude>42 <small>µV</small></strong>
-            </div>
-            <div>
-              <span>Rhythmicity</span>
-              <strong data-rhythmicity>0.18</strong>
-            </div>
-            <div class="classification">
-              <span>Classification</span>
-              <strong data-classification>INTERICTAL</strong>
-            </div>
-          </div>
-        </section>
-
-        <section class="brain-panel panel">
-          <div class="panel-heading brain-heading">
-            <div>
-              <span class="micro-label">ANATOMICAL DIGITAL TWIN / 02</span>
-              <h2>神经活动映射</h2>
-              <p class="heading-detail">24 structures · synchronized activity model</p>
-            </div>
-            <div class="view-tabs" role="group" aria-label="脑模型视角">
-              <button class="is-active" type="button" data-view="lateral">LATERAL <small>外侧</small></button>
-              <button type="button" data-view="superior">SUPERIOR <small>顶部</small></button>
-              <button type="button" data-view="posterior">POSTERIOR <small>后侧</small></button>
-            </div>
-          </div>
-
-          <div class="brain-stage" data-brain-stage>
-            <div class="brain-canvas" data-brain-canvas aria-label="可旋转的透明电气风格三维脑模型"></div>
-
-            <div class="model-loader" data-model-loader>
-              <i aria-hidden="true"></i>
-              <span>LOADING 24 ANATOMICAL STRUCTURES</span>
-            </div>
-
-            <div class="anatomy-tooltip" data-anatomy-tooltip role="status" aria-live="polite">
-              <span>ANATOMICAL STRUCTURE</span>
-              <strong data-anatomy-name>左颞叶</strong>
-              <small data-anatomy-state>BASELINE ACTIVITY</small>
-            </div>
-
-            <div class="anatomy-dock" data-anatomy-dock>
-              <div class="dock-heading">
-                <div><span>MODEL EXPLORER</span><strong>解剖层级</strong></div>
-                <button type="button" data-dock-toggle aria-label="收起解剖层级控制" aria-expanded="true">−</button>
-              </div>
-              <div class="dock-content">
-                <div class="anatomy-layers" aria-label="脑解剖层级控制">
-                  <button class="is-active" type="button" data-layer="cortex" aria-pressed="true"><i></i><span>CORTEX<small>大脑皮层</small></span></button>
-                  <button class="is-active" type="button" data-layer="limbic" aria-pressed="true"><i></i><span>LIMBIC<small>边缘系统</small></span></button>
-                  <button class="is-active" type="button" data-layer="nuclei" aria-pressed="true"><i></i><span>NUCLEI<small>深部核团</small></span></button>
-                  <button class="is-active" type="button" data-layer="ventricles" aria-pressed="true"><i></i><span>CSF<small>脑室系统</small></span></button>
-                  <button class="is-active" type="button" data-layer="cerebellum" aria-pressed="true"><i></i><span>CEREBELLUM<small>小脑</small></span></button>
-                  <button class="is-active" type="button" data-layer="brainstem" aria-pressed="true"><i></i><span>BRAINSTEM<small>脑干</small></span></button>
-                </div>
-
-                <div class="anatomy-legend" aria-label="脑叶颜色图例">
-                  <span><i class="frontal"></i>FRONTAL</span>
-                  <span><i class="parietal"></i>PARIETAL</span>
-                  <span><i class="temporal"></i>TEMPORAL</span>
-                  <span><i class="occipital"></i>OCCIPITAL</span>
-                </div>
+            <div class="sensor-map-copy">
+              <strong id="sensor-map-title">EPOC X 接触质量</strong>
+              <p id="sensor-map-description">14 个 EEG 电极；CMS/DRL 位于 P3/P4 参考位置。</p>
+              <div class="quality-legend">
+                <span><i class="good"></i>良好</span>
+                <span><i class="average"></i>一般</span>
+                <span><i class="poor"></i>较差</span>
               </div>
             </div>
+          </div>
 
-            <div class="brain-status">
-              <span class="status-kicker">CURRENT PHASE <b data-phase-index>01 / 03</b></span>
-              <strong data-network-state>BASELINE COHERENCE</strong>
-              <span class="status-detail" data-network-detail>自发性皮层活动处于稳定基线</span>
+          <div class="waveform-stage" id="waveform-stage">
+            <div class="time-grid-labels" aria-hidden="true">
+              <span>-4s</span><span>-3s</span><span>-2s</span><span>-1s</span><span>NOW</span>
+            </div>
+            <div class="channel-list" id="channel-list"></div>
+            <div class="onset-cursor" id="onset-cursor">
+              <span>疑似起始</span>
+            </div>
+          </div>
+
+          <button class="collapsed-channels" id="toggle-hidden" type="button">
+            <span><b id="hidden-count">7</b> 个未达优秀阈值通道</span>
+            <span id="hidden-copy">查看质量详情</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+          </button>
+
+          <footer class="signal-metrics">
+            <div>
+              <span>主导频率</span>
+              <strong id="dominant-frequency">9.4 <small>Hz</small></strong>
+            </div>
+            <div>
+              <span>峰值幅度</span>
+              <strong id="peak-amplitude">42 <small>µV</small></strong>
+            </div>
+            <div>
+              <span>节律性</span>
+              <strong id="rhythmicity">0.18</strong>
+            </div>
+            <div class="classification-metric">
+              <span>当前分类</span>
+              <strong id="classification">INTERICTAL</strong>
+            </div>
+          </footer>
+        </article>
+
+        <article class="panel brain-panel">
+          <header class="panel-header brain-header">
+            <div>
+              <span class="eyebrow">ANATOMICAL MODEL / 02</span>
+              <h1>脑区概率映射</h1>
+              <p>脑叶级推测 · 不代表精确致痫灶定位</p>
+            </div>
+            <div class="view-switcher" role="group" aria-label="脑模型视角">
+              <button class="active" data-view="lateral" type="button">侧位</button>
+              <button data-view="superior" type="button">顶部</button>
+              <button data-view="posterior" type="button">后部</button>
+              <button data-view="reset" type="button" aria-label="复位视角">
+                <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" /></svg>
+              </button>
+            </div>
+          </header>
+
+          <div class="brain-stage" id="brain-stage">
+            <canvas id="brain-canvas" aria-label="可旋转的三维脑区模型"></canvas>
+
+            <div class="brain-model-loader" role="status">
+              <i></i><span id="brain-model-loader">LOADING 24 ANATOMICAL STRUCTURES</span>
             </div>
 
-            <div class="provenance-chip">
-              <span>MODEL</span>
-              <strong>ANATOMICAL · 24 REGIONS</strong>
-              <i aria-hidden="true"></i>
-              <span>SIGNAL</span>
-              <strong>SYNTHETIC · 256 Hz</strong>
-            </div>
-
-            <div class="focus-label" data-focus-label>
-              <span class="focus-ping" aria-hidden="true"></span>
-              <div>
-                <small>SEIZURE ONSET ZONE</small>
-                <strong>LEFT TEMPORAL</strong>
-                <span data-focus-value>ACTIVATION 0.00</span>
+            <div class="structure-panel">
+              <div class="structure-title">
+                <span>MODEL LAYERS</span>
+                <strong>脑区图层</strong>
               </div>
+              <label><input type="checkbox" data-layer="cortex" checked /><span></span>真实解剖皮层</label>
+              <label><input type="checkbox" data-layer="regions" checked /><span></span>深部解剖结构</label>
+              <label><input type="checkbox" data-layer="electrodes" checked /><span></span><em id="electrode-layer-label">EPOC X 电极</em></label>
+              <label><input type="checkbox" data-layer="particles" checked /><span></span>神经网络 / 活动</label>
+              <div class="activity-scale">
+                <span>ACTIVITY</span>
+                <div></div>
+                <small><b>LOW</b><b>HIGH</b></small>
+              </div>
+            </div>
+
+            <div class="brain-readout" id="brain-readout">
+              <span class="readout-label">CURRENT ESTIMATE · DEMO</span>
+              <strong id="region-name">未发现明显异常区域</strong>
+              <div class="confidence-row">
+                <span>区域置信度</span>
+                <div><i id="confidence-bar"></i></div>
+                <b id="confidence-value">—</b>
+              </div>
+              <p id="region-evidence">当前为基线状态，脑区仅显示低强度背景活动。</p>
+            </div>
+
+            <div class="model-help">
+              <span>拖拽旋转</span><i></i><span>滚轮缩放</span>
+              <a href="./assets/anatomy/LICENSE.md" target="_blank" rel="noreferrer">BodyParts3D · CC BY-SA</a>
             </div>
 
             <div class="orientation-cube" aria-hidden="true">
-              <span>A</span><span>L</span><span>S</span>
+              <span>ANT</span><span>R</span>
             </div>
-
-            <div class="intensity-scale" aria-label="脑区活动强度图例">
-              <span>ACTIVITY</span>
-              <i></i>
-              <div><small>LOW</small><small>HIGH</small></div>
-            </div>
-
-            <p class="interaction-hint">DRAG TO ROTATE · SCROLL TO ZOOM</p>
           </div>
-        </section>
+
+          <footer class="phase-footer">
+            <div>
+              <span>CURRENT PHASE <b id="phase-index">01 / 04</b></span>
+              <strong id="phase-title">BASELINE / 基线</strong>
+              <p id="phase-description">稳定背景节律，尚未发现满足阈值的癫痫样活动。</p>
+            </div>
+            <div class="traceability-card">
+              <span>证据链</span>
+              <strong id="evidence-channels">AF3 · F7 · F3</strong>
+              <small>时间窗 / 通道 / 模型版本可追溯</small>
+            </div>
+          </footer>
+        </article>
       </section>
 
-      <section class="transport panel" aria-label="病例回放控制">
-        <div class="transport-controls">
-          <button class="icon-button" type="button" data-reset aria-label="重新开始">↶</button>
-          <button class="play-button" type="button" data-play aria-label="播放">
-            <span data-play-icon>▶</span>
+      <section class="timeline-panel" aria-label="病例播放时间轴">
+        <div class="playback-controls">
+          <button class="transport-button" id="reset-playback" type="button" aria-label="回到开始">
+            <svg viewBox="0 0 24 24"><path d="M4 4v6h6M5.5 15a8 8 0 1 0 .7-7.2" /></svg>
           </button>
-          <div class="timecode">
-            <strong data-current-time>00:00.00</strong>
+          <button class="play-button" id="play-toggle" type="button" aria-label="播放">
+            <svg class="play-icon" viewBox="0 0 24 24"><path d="m9 6 9 6-9 6Z" /></svg>
+            <svg class="pause-icon" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12" /></svg>
+          </button>
+          <div class="time-display">
+            <strong id="current-time">00:00.00</strong>
             <span>/ 00:24.00</span>
           </div>
         </div>
 
-        <div class="timeline-wrap">
-          <div class="chapter-controls" aria-label="演示章节">
-            <button class="is-active" type="button" data-jump="0">
-              <span>01</span><strong>基线活动</strong><small>BASELINE · 0.00 SEC</small>
-            </button>
-            <button type="button" data-jump="10.8">
-              <span>02</span><strong>局灶起始</strong><small>FOCAL ONSET · 9.60 SEC</small>
-            </button>
-            <button type="button" data-jump="15.2">
-              <span>03</span><strong>网络传播</strong><small>NETWORK SPREAD · 13.40 SEC</small>
-            </button>
-          </div>
-          <div class="timeline">
-            <div class="timeline-segment preictal"></div>
-            <div class="timeline-segment ictal"></div>
-            <input
-              type="range"
-              min="0"
-              max="24"
-              value="0"
-              step="0.01"
-              data-scrubber
-              aria-label="病例播放时间"
-            />
-            <span class="event-marker onset" aria-hidden="true"></span>
-            <span class="event-marker spread" aria-hidden="true"></span>
-          </div>
+        <div class="phase-steps" id="phase-steps">
+          <button data-time="1" class="active" type="button">
+            <span>01</span><strong>基线 / 尖慢波</strong><small>0–8 SEC</small>
+          </button>
+          <button data-time="9" type="button">
+            <span>02</span><strong>左颞节律起始</strong><small>8–13 SEC</small>
+          </button>
+          <button data-time="15" type="button">
+            <span>03</span><strong>邻近通道募集</strong><small>13–20 SEC</small>
+          </button>
+          <button data-time="22" type="button">
+            <span>04</span><strong>发作后慢化</strong><small>20–24 SEC</small>
+          </button>
         </div>
 
-        <div class="transport-options">
-          <button type="button" data-speed>1.0×</button>
-          <button type="button" data-auto-rotate aria-pressed="true"><i></i> AUTO ROTATE</button>
-          <button class="next-event" type="button" data-next-event>NEXT EVENT <span>→</span></button>
+        <div class="timeline-control">
+          <div class="timeline-track" id="timeline-track">
+            <div class="timeline-gradient"></div>
+            <div class="event-range" id="event-range"></div>
+            <div class="timeline-progress" id="timeline-progress"></div>
+            <div class="timeline-thumb" id="timeline-thumb"></div>
+            <button class="event-marker onset" data-time="8" type="button" aria-label="疑似事件起始"></button>
+            <button class="event-marker spread" data-time="13" type="button" aria-label="网络增强"></button>
+            <button class="event-marker recovery" data-time="20" type="button" aria-label="恢复阶段"></button>
+          </div>
+          <div class="timeline-labels"><span>00:00</span><span>00:08</span><span>00:13</span><span>00:20</span><span>00:24</span></div>
+        </div>
+
+        <div class="timeline-actions">
+          <select id="speed-select" aria-label="播放速度">
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1.0×</option>
+            <option value="2">2.0×</option>
+          </select>
+          <button class="auto-rotate active" id="auto-rotate" type="button"><i></i>自动旋转</button>
         </div>
       </section>
-
-      <footer class="footer-note">
-        <span>DEMONSTRATION ENVIRONMENT · SYNTHETIC CASE</span>
-        <span>RESEARCH VISUALIZATION ONLY — NOT A MEDICAL DEVICE</span>
-        <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/" target="_blank" rel="noreferrer">ANATOMY: BODYPARTS3D · CC BY-SA 2.1 JP</a>
-      </footer>
     </main>
 
-    <noscript>该演示需要启用 JavaScript。</noscript>
+    <aside class="validation-drawer" id="validation-drawer" aria-hidden="true">
+      <header>
+        <div>
+          <span class="eyebrow">VALIDATION / LIVE</span>
+          <h2>验证中心</h2>
+          <p>运行门控 + 完整验证设计框架</p>
+        </div>
+        <button class="icon-button" id="close-validation" type="button" aria-label="关闭验证中心">×</button>
+      </header>
+      <div class="validation-overview">
+        <div class="score-ring"><strong id="validation-score">92</strong><span>运行分</span></div>
+        <div><strong id="validation-status-title">6 项通过 · 1 项关注</strong><p>这是工程运行指标，不是医学有效性结论。</p></div>
+      </div>
+      <div class="drawer-section-title">
+        <span>RUNTIME GATES</span>
+        <strong>当前运行指标</strong>
+      </div>
+      <div class="validation-list" id="validation-list"></div>
+      <div class="validation-flow" aria-label="验证门控顺序">
+        <span>硬件</span><i></i><span>数据质量</span><i></i><span>信号同步</span><i></i><span>事件模型</span><i></i><span>脑区映射</span><i></i><span>人因/系统</span>
+      </div>
+      <div class="drawer-section-title hardware-title">
+        <span>DESIGN FRAMEWORK</span>
+        <strong>方面 → Metric → 方法 → 原因</strong>
+      </div>
+      <div class="validation-dimension-tabs" id="validation-dimension-tabs" role="tablist" aria-label="验证方面"></div>
+      <div class="validation-dimension-summary">
+        <div>
+          <span id="validation-dimension-code">01 / HARDWARE</span>
+          <strong id="hardware-evaluation-title">硬件</strong>
+          <p id="validation-dimension-purpose">先确认设备采到的信号和时间轴可信。</p>
+          <small id="validation-dimension-gate">硬件失败 → 数据段无效</small>
+        </div>
+        <div class="framework-device-context">
+          <span class="framework-device-art" id="validation-device-art"><img src="./assets/devices/epoc-x.webp" alt="" /></span>
+          <div>
+            <small>CURRENT DEVICE</small>
+            <strong id="validation-device-name">EPOC X</strong>
+            <a id="validation-device-source" href="https://www.emotiv.com/epoc-x" target="_blank" rel="noreferrer">官方资料 ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="validation-framework-list" id="hardware-evaluation-list"></div>
+      <div class="drawer-links">
+        <a href="../EPOC_X_HARDWARE_EVALUATION.md" class="validation-link">硬件专项评估 →</a>
+        <a href="../VALIDATION_PLAN.md" class="validation-link">完整验证框架 →</a>
+      </div>
+    </aside>
+
+    <div class="modal-backdrop" id="connect-modal" aria-hidden="true">
+      <section class="connect-dialog" role="dialog" aria-modal="true" aria-labelledby="connect-title">
+        <header>
+          <div>
+            <span class="eyebrow">CORTEX API / WSS</span>
+            <h2 id="connect-title">连接 EEG 设备</h2>
+          </div>
+          <button class="icon-button" id="close-connect" type="button" aria-label="关闭">×</button>
+        </header>
+
+        <div class="connection-steps">
+          <span class="active">1. Launcher</span><span>2. 授权</span><span>3. Headset</span><span>4. Streams</span>
+        </div>
+
+        <p class="connect-intro" id="connect-intro">
+          请先打开 EMOTIV Launcher、登录 EmotivID 并连接 EPOC X。凭据仅保存在当前页面内存中，不会写入文件或浏览器存储。
+        </p>
+
+        <div id="cortex-fields">
+          <label class="field-label">
+            Cortex Client ID
+            <input id="client-id" type="text" autocomplete="off" placeholder="输入 Cortex App Client ID" />
+          </label>
+          <label class="field-label">
+            Cortex Client Secret
+            <input id="client-secret" type="password" autocomplete="off" placeholder="输入 Client Secret" />
+          </label>
+        </div>
+
+        <div id="bridge-fields" hidden>
+          <label class="field-label">
+            统一设备 Bridge WebSocket
+            <input id="bridge-endpoint" type="text" autocomplete="off" value="ws://localhost:8765" />
+          </label>
+          <div class="bridge-schema">
+            接收统一 JSON：<code>{type:"eeg", channels:{F7:12.4, T7:9.8}}</code>
+          </div>
+        </div>
+
+        <div class="license-note" id="connection-note">
+          <svg viewBox="0 0 24 24"><path d="M12 8v5m0 3h.01M4.9 19h14.2a1 1 0 0 0 .87-1.5L12.87 5a1 1 0 0 0-1.74 0L4.03 17.5A1 1 0 0 0 4.9 19Z" /></svg>
+          <span>实时原始 EEG 的 <code>eeg</code> 数据流需要相应 Cortex Developer API 权限；设备、电池和质量流会按账户权限订阅。</span>
+        </div>
+
+        <div class="connection-log" id="connection-log">等待连接…</div>
+
+        <footer>
+          <button class="ghost-button" id="use-demo" type="button">继续使用演示数据</button>
+          <button class="primary-button" id="connect-device" type="button">连接当前设备</button>
+        </footer>
+      </section>
+    </div>
+
+    <template id="channel-template">
+      <div class="channel-row">
+        <div class="channel-identity">
+          <i class="quality-dot"></i>
+          <strong></strong>
+          <small></small>
+        </div>
+        <canvas></canvas>
+        <div class="channel-score">
+          <span class="score-type"></span>
+          <strong></strong>
+        </div>
+        <button class="pin-button" type="button" aria-label="固定通道">
+          <svg viewBox="0 0 24 24"><path d="m14 4 6 6-3 1-4 4-1 5-2-2-2-2 5-1 4-4Z" /></svg>
+        </button>
+      </div>
+    </template>
+
+    <script src="./device-profiles.js"></script>
+    <script src="./validation-framework.js"></script>
+    <script type="module" src="./brain-renderer.js"></script>
+    <script src="./generic-device-client.js"></script>
+    <script src="./cortex-client.js"></script>
+    <script type="module" src="./app.js"></script>
   </body>
 </html>

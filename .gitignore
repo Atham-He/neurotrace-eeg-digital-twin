@@ -1,25 +1,6 @@
-# Dependencies and generated output
-node_modules/
 dist/
-
-# Local hosting and environment bindings
-.openai/
-.env
-.env.*
-!.env.example
-
-# Python caches
-__pycache__/
-*.py[cod]
-
-# Editor and OS artifacts
+node_modules/
 .DS_Store
 Thumbs.db
-*.swp
-.idea/
-.vscode/
-
-# Local diagnostics and screenshots
-debug.log
-tmp/
+.chrome-*/
 *.log
