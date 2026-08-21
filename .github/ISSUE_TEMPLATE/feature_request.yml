@@ -1,0 +1,24 @@
+name: Feature request
+description: Propose a focused product or visualization improvement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user or presentation problem should be solved?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe the observable result, not only an implementation idea.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Scientific, data or licensing constraints
+      description: Note any clinical framing, data governance or third-party asset considerations.
